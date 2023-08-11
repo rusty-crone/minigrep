@@ -3,12 +3,10 @@ use std::{env, fs};
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() < 3 {
-        println!("Usage: cargo run -- <query> <file_path>");
-        return
-    }
-
-    let config = parse_configs(&args);
+    let config = Config::build(&args).unwrap_or_else(|err| {
+        print!("Problem parsing arguments: {err}");
+        std::process::exit(1);
+    });
 
     let contents = fs::read_to_string(&config.file_path)
         .expect("Should have been able to read the file");
@@ -23,9 +21,14 @@ struct Config {
     file_path: String,
 }
 
-fn parse_configs(args: &[String]) -> Config {
-    let query = args[1].clone();
-    let file_path = args[2].clone();
+impl Config {
+    fn build(args: &[String]) -> Result<Config, &'static str> {
+        if args.len() < 3 {
+            return Err("Usage: cargo run -- <query> <file_path>");
+        }
+        let query = args[1].clone();
+        let file_path = args[2].clone();
 
-    Config{ query, file_path }
+        Ok(Config{ query, file_path })
+    }
 }
