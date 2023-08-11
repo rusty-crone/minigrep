@@ -1,19 +1,29 @@
-use std::{env, fs};
+use std::{env, fs, process};
+use std::error::Error;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
     let config = Config::build(&args).unwrap_or_else(|err| {
         print!("Problem parsing arguments: {err}");
-        std::process::exit(1);
+        process::exit(1);
     });
 
+    if let Err(e) = run(config) {
+        println!("Application error: {e}");
+        process::exit(1);
+    }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(&config.file_path)
         .expect("Should have been able to read the file");
 
     println!("Searching for {}", config.query);
     println!("In file {}", config.file_path);
     println!("With text:\n{contents}");
+
+    Ok(())
 }
 
 struct Config {
