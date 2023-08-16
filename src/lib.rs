@@ -5,9 +5,13 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(&config.file_path)
         .expect("Should have been able to read the file");
 
-    println!("Searching for {}", config.query);
-    println!("In file {}", config.file_path);
-    println!("With text:\n{contents}");
+    for line in search(&config.query, &contents) {
+        println!("{line}");
+    }
+
+    // println!("Searching for {}", config.query);
+    // println!("In file {}", config.file_path);
+    // println!("With text:\n{contents}");
 
     Ok(())
 }
